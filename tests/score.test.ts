@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { rankIssues } from "../src/score.js";
+describe("rankIssues", () => { it("puts clearly beginner-friendly issues first", () => { const ranked = rankIssues([{ title: "Complex issue", url: "https://github.com/example/repo/issues/2", repository: "example/repo", labels: ["bug"], comments: 20, updatedAt: new Date().toISOString() }, { title: "Easy issue", url: "https://github.com/example/repo/issues/1", repository: "example/repo", labels: ["good first issue"], comments: 1, updatedAt: new Date().toISOString() }]); expect(ranked[0].title).toBe("Easy issue"); }); });
