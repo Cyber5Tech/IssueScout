@@ -1,41 +1,234 @@
 # IssueScout
 
-IssueScout is a small, open-source CLI for finding GitHub issues that are welcoming to new contributors.
+[![CI](https://github.com/Cyber5Tech/IssueScout/actions/workflows/ci.yml/badge.svg)](https://github.com/Cyber5Tech/IssueScout/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Quick start
+IssueScout is an open-source command-line tool for discovering beginner-friendly GitHub issues. It searches GitHub’s public issue index, filters for issues that welcome contributors, and ranks results so you can spend less time searching and more time contributing.
+
+## Why IssueScout?
+
+Finding a suitable first contribution can be difficult. A repository may have thousands of issues, incomplete labels, or tasks that are no longer active. IssueScout gives contributors a fast starting point by focusing on open issues commonly marked for newcomers.
+
+## Features
+
+- Searches open GitHub issues labeled `good first issue` or `help wanted`.
+- Filters results by programming language.
+- Searches by topic, keyword, or technology.
+- Ranks results on a 0–100 score.
+- Displays issue titles, repositories, labels, and direct links.
+- Runs locally as a lightweight TypeScript CLI.
+- Includes automated tests and GitHub Actions CI.
+
+## Requirements
+
+- Node.js 20 or newer
+- npm 10 or newer
+- Internet access for GitHub API requests
+
+Check your installed versions:
 
 ```bash
-npm install
-npm run dev -- search --language TypeScript --topic documentation
+node --version
+npm --version
 ```
 
-The search uses GitHub's public API. GitHub's unauthenticated rate limit still applies.
+## Installation
 
-## What it does
+Clone the repository and install its dependencies:
 
-- Searches open issues marked `good first issue` or `help wanted`.
-- Filters by language and topic.
-- Scores results using beginner-friendly labels, freshness, and discussion volume.
-- Prints repository names, labels, scores, and direct links.
+```bash
+git clone https://github.com/Cyber5Tech/IssueScout.git
+cd IssueScout
+npm install
+```
 
-## Development
+Build the TypeScript source:
 
 ```bash
 npm run build
+```
+
+You can now run IssueScout through the development command or the compiled output.
+
+## Usage
+
+### Search for issues
+
+Run a broad search for beginner-friendly issues:
+
+```bash
+npm run dev -- search
+```
+
+Search for TypeScript issues:
+
+```bash
+npm run dev -- search --language TypeScript
+```
+
+Search for documentation-related issues in Python projects:
+
+```bash
+npm run dev -- search --language Python --topic documentation
+```
+
+Search for issues related to accessibility:
+
+```bash
+npm run dev -- search --topic accessibility
+```
+
+Limit the number of results:
+
+```bash
+npm run dev -- search --topic testing --limit 5
+```
+
+After building, run the compiled CLI directly:
+
+```bash
+node dist/cli.js search --language JavaScript --topic documentation
+```
+
+If the package is installed globally or linked locally, the command is also available as:
+
+```bash
+issuescout search --language TypeScript --topic documentation
+```
+
+### Command options
+
+| Option | Description | Example |
+| --- | --- | --- |
+| `-l, --language <language>` | Filter by GitHub’s detected repository language | `--language Rust` |
+| `-t, --topic <topic>` | Add a topic or keyword to the GitHub search | `--topic accessibility` |
+| `-n, --limit <number>` | Set the maximum number of results; defaults to `10` | `--limit 5` |
+| `-V, --version` | Display the IssueScout version | `--version` |
+| `-h, --help` | Display command help | `--help` |
+
+> Note: GitHub search syntax is used behind the scenes. A topic containing spaces can be passed as a quoted value, for example `--topic "machine learning"`.
+
+## Understanding the score
+
+Each result receives a score from 0 to 100. The current MVP uses three signals:
+
+- **Beginner-friendly label — up to 50 points:** issues with `good first issue`, `help wanted`, or `first-timers-only` receive this bonus.
+- **Discussion volume — up to 30 points:** issues with fewer comments score higher, because they may be easier to approach.
+- **Freshness — up to 20 points:** recently updated issues score higher than older issues.
+
+The score is a guide, not a guarantee. Before starting work, read the issue, inspect the repository’s contribution guidelines, and ask whether someone else is already working on it.
+
+## GitHub API limits
+
+IssueScout uses GitHub’s public Search Issues API and does not require a token for the current MVP. Unauthenticated API requests are rate-limited by GitHub. If searches stop working temporarily, wait and try again later.
+
+Authentication and higher-rate-limit support are planned for a future release.
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the CLI directly from TypeScript during development:
+
+```bash
+npm run dev -- search --topic documentation
+```
+
+Compile the project:
+
+```bash
+npm run build
+```
+
+Run the test suite:
+
+```bash
 npm test
+```
+
+The same build and test checks run automatically in GitHub Actions for pushes to `main` and pull requests.
+
+## Project structure
+
+```text
+IssueScout/
+├── .github/workflows/ci.yml  # Continuous integration workflow
+├── src/cli.ts                 # Command-line interface
+├── src/github.ts              # GitHub API client and issue types
+├── src/score.ts               # Issue scoring and ranking
+├── tests/score.test.ts        # Ranking behavior tests
+├── LICENSE                    # MIT license
+├── package.json               # Scripts and dependencies
+└── tsconfig.json              # TypeScript configuration
+```
+
+## Troubleshooting
+
+### `npm install` fails
+
+Confirm that Node.js 20 or newer is installed, then retry:
+
+```bash
+node --version
+npm install
+```
+
+### GitHub returns a rate-limit error
+
+The unauthenticated GitHub API limit has been reached. Wait for the limit to reset, or use the project’s planned authentication support when it becomes available.
+
+### No issues are found
+
+Try a broader search by removing the language or topic filter:
+
+```bash
+npm run dev -- search
+```
+
+GitHub issue labels vary by project, and IssueScout currently focuses on a small set of contributor-friendly labels.
+
+### The command is not recognized
+
+Use the development form from the repository root:
+
+```bash
+npm run dev -- search
+```
+
+Or build first and run the compiled file:
+
+```bash
+npm run build
+node dist/cli.js search
 ```
 
 ## Roadmap
 
-- Add GitHub token support for higher rate limits.
-- Save and revisit issues locally.
-- Add project health signals such as recent commits and response time.
-- Offer JSON output for integrations.
+- Add GitHub token support for higher API limits.
+- Add JSON output for scripts and integrations.
+- Save and revisit interesting issues locally.
+- Add repository health signals such as recent commits and response time.
+- Explain each score with a per-signal breakdown.
+- Add filters for issue age, repository size, and contribution language.
+- Add an interactive mode for browsing and saving issues.
 
 ## Contributing
 
-Issues and pull requests are welcome. Start by running the project locally, reading the roadmap, and opening an issue describing the change you have in mind.
+Contributions are welcome. To get started:
+
+1. Fork the repository.
+2. Create a branch for your change.
+3. Install dependencies with `npm install`.
+4. Make your change and add or update tests where appropriate.
+5. Run `npm run build` and `npm test`.
+6. Open a pull request with a clear description of the change.
+
+For substantial changes, open an issue first so the approach can be discussed. Please keep pull requests focused and follow the existing TypeScript style.
 
 ## License
 
-MIT
+IssueScout is available under the [MIT License](LICENSE).
