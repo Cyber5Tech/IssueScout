@@ -3,7 +3,7 @@
 [![CI](https://github.com/Cyber5Tech/IssueScout/actions/workflows/ci.yml/badge.svg)](https://github.com/Cyber5Tech/IssueScout/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-IssueScout is an open-source command-line tool for discovering beginner-friendly GitHub issues. It searches GitHub’s public issue index, filters for issues that welcome contributors, and ranks results so you can spend less time searching and more time contributing.
+IssueScout is an open-source command-line tool for discovering beginner-friendly GitHub issues and organizing the opportunities you want to pursue. It searches GitHub’s public issue index, filters for issues that welcome contributors, and ranks results so you can spend less time searching and more time contributing.
 
 ## Why IssueScout?
 
@@ -16,6 +16,10 @@ Finding a suitable first contribution can be difficult. A repository may have th
 - Searches by topic, keyword, or technology.
 - Ranks results on a 0–100 score.
 - Displays issue titles, repositories, labels, and direct links.
+- Supports JSON output for scripts and integrations.
+- Optionally includes repository health signals such as stars, forks, and open issues.
+- Saves interesting issues locally for later review.
+- Supports authenticated GitHub requests through `GITHUB_TOKEN`.
 - Runs locally as a lightweight TypeScript CLI.
 - Includes automated tests and GitHub Actions CI.
 
@@ -102,12 +106,70 @@ issuescout search --language TypeScript --topic documentation
 | --- | --- | --- |
 | `-l, --language <language>` | Filter by GitHub’s detected repository language | `--language Rust` |
 | `-t, --topic <topic>` | Add a topic or keyword to the GitHub search | `--topic accessibility` |
-| `-n, --limit <number>` | Set the maximum number of results; defaults to `10` | `--limit 5` |
+| `-n, --limit <number>` | Set the maximum number of results from 1 to 100; defaults to `10` | `--limit 5` |
+| `--json` | Print machine-readable JSON | `--json` |
+| `--health` | Include repository health signals | `--health` |
 | `-V, --version` | Display the IssueScout version | `--version` |
 | `-h, --help` | Display command help | `--help` |
 
 > Note: GitHub search syntax is used behind the scenes. A topic containing spaces can be passed as a quoted value, for example `--topic "machine learning"`.
 
+## Saving issues
+
+Save an issue for later review:
+
+```bash
+npm run dev -- save https://github.com/owner/repository/issues/123
+```
+
+List saved issues:
+
+```bash
+npm run dev -- saved
+npm run dev -- saved --json
+```
+
+Remove a saved issue:
+
+```bash
+npm run dev -- remove https://github.com/owner/repository/issues/123
+```
+
+Saved issues are stored locally in `.issuescout/saved.json`, which is excluded from version control.
+
+## JSON output and repository health
+
+Use `--json` when another tool will consume the results:
+
+```bash
+npm run dev -- search --topic accessibility --json
+```
+
+Add repository health signals to each result:
+
+```bash
+npm run dev -- search --health --limit 5
+```
+
+Health data includes stars, forks, open issue count, and the repository’s latest push timestamp. Health lookups make additional GitHub API requests, so use them selectively.
+
+## GitHub authentication
+
+Set `GITHUB_TOKEN` to use authenticated requests and receive a higher GitHub API rate limit. Never commit the token to the repository.
+
+PowerShell:
+
+```powershell
+$env:GITHUB_TOKEN = "your-github-token"
+```
+
+macOS or Linux:
+
+```bash
+export GITHUB_TOKEN="your-github-token"
+```
+
+The token is optional. IssueScout continues to use unauthenticated public requests when it is not set.
 ## Understanding the score
 
 Each result receives a score from 0 to 100. The current MVP uses three signals:
@@ -168,7 +230,8 @@ IssueScout/
 
 ## Troubleshooting
 
-### `npm install` fails
+### 
+pm install` fails
 
 Confirm that Node.js 20 or newer is installed, then retry:
 
@@ -208,11 +271,11 @@ node dist/cli.js search
 
 ## Roadmap
 
-- Add GitHub token support for higher API limits.
-- Add JSON output for scripts and integrations.
-- Save and revisit interesting issues locally.
-- Add repository health signals such as recent commits and response time.
-- Explain each score with a per-signal breakdown.
+- Add GitHub token support for higher API limits. *(Implemented in v0.2.0)*
+- Add JSON output for scripts and integrations. *(Implemented in v0.2.0)*
+- Save and revisit interesting issues locally. *(Implemented in v0.2.0)*
+- Add repository health signals such as stars, forks, open issues, and latest push time. *(Initial version implemented in v0.2.0)*
+- Explain each score with a per-signal breakdown. *(Implemented in v0.2.0)*
 - Add filters for issue age, repository size, and contribution language.
 - Add an interactive mode for browsing and saving issues.
 
@@ -222,9 +285,12 @@ Contributions are welcome. To get started:
 
 1. Fork the repository.
 2. Create a branch for your change.
-3. Install dependencies with `npm install`.
+3. Install dependencies with 
+pm install`.
 4. Make your change and add or update tests where appropriate.
-5. Run `npm run build` and `npm test`.
+5. Run 
+pm run build` and 
+pm test`.
 6. Open a pull request with a clear description of the change.
 
 For substantial changes, open an issue first so the approach can be discussed. Please keep pull requests focused and follow the existing TypeScript style.
